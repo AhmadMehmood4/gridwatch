@@ -1,294 +1,453 @@
 
 # ⚡ GridWatch — Transmission Grid Monitoring & Alert System
 
-**A Python-based, interactive dashboard for monitoring a simulated high-voltage transmission network, detecting operating abnormalities, and reviewing historical system performance.**
+**A Python-based interactive dashboard for monitoring a simulated high-voltage transmission network, detecting operating abnormalities, managing alarms, and analyzing historical system performance.**
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Open_GridWatch-16A6D5?style=for-the-badge)](https://gridwatch-transmission.streamlit.app/)
 [![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![SQLite](https://img.shields.io/badge/SQLite-Historical_Data-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 
-**[Launch the live dashboard](https://gridwatch-transmission.streamlit.app/)** · **[View the source code](https://github.com/AhmadMehmood4/gridwatch)**
-
-![GridWatch operations overview](images/01_operations_overview.png)
-
-> **Important:** GridWatch is an educational simulator using synthetic telemetry and a fictional Ontario-inspired transmission layout. It is not connected to a utility's live grid or SCADA/EMS infrastructure. Measurements are simulated and internally consistent; they are not the result of a validated AC power-flow study.
+**[Live Application](https://gridwatch-transmission.streamlit.app/) | [GitHub Repository](https://github.com/AhmadMehmood4/gridwatch) | [Portfolio](https://ahmadmehmood.dev)**
 
 ---
 
-## Project Overview
+## 1. Project Overview
 
-GridWatch was developed to explore how transmission system operating data can be presented in a centralized monitoring interface.
+GridWatch is a transmission grid monitoring and alert system developed using Python, Streamlit, and SQLite.
 
-Instead of inspecting individual measurements manually, an operator can use the dashboard to monitor transmission-line loading, identify abnormal conditions, acknowledge alarms, inspect equipment status, and review historical events.
+The project demonstrates how a centralized monitoring application can help operators observe transmission network conditions, identify equipment abnormalities, respond to alarms, and review historical operating data.
 
-The simulated network contains:
+The application uses synthetic telemetry from a fictional Ontario-inspired transmission network. It provides an interactive environment for testing overloads, voltage abnormalities, equipment outages, and recovery scenarios.
+
+The simulated network consists of:
 
 - **8 substations**
 - **12 transmission lines**
 - **500 kV, 230 kV, and 115 kV voltage classes**
-- **Automated fault detection and alarm management**
-- **Historical telemetry storage and SQL analytics**
+- **Automated overload, outage, and voltage monitoring**
+- **Operator alarm acknowledgement**
+- **Persistent alarm and operational event history**
+- **SQL-based historical analytics and reports**
 
-A controllable simulation generates operating measurements and allows users to inject faults for repeatable testing.
+### Operations Overview
 
-## Key Features
+The Operations Overview dashboard provides a real-time summary of simulated network conditions.
 
-### 1. Operations Overview
+It displays equipment availability, transmission-line loading, active warnings, critical alarms, and operational events.
 
-The main dashboard provides a summary of the simulated transmission network, including:
+![Operations Overview](01_baseline_overview.png)
 
-- Transmission-line loading percentages
-- Equipment availability
-- Active warnings and critical alarms
-- System operating status
-- Operational event history
-- Highest-loaded transmission lines
+### Transmission Network Map
 
-This allows users to identify abnormal operating conditions without examining every line individually.
-
-### 2. Interactive Transmission Network Map
-
-The network map displays a schematic representation of the transmission system.
+GridWatch includes an interactive schematic single-line network map showing the connections between substations.
 
 Users can select individual transmission lines to view:
 
-- Nominal and measured voltage
-- Current and rated-current limit
-- Loading percentage
+- Current loading (%)
+- Measured voltage (kV and pu)
+- Current (A)
 - Active power (MW)
 - Reactive power (MVAr)
 - Apparent power (MVA)
 - Equipment operating status
-- Associated alarms
+- Associated alarms and historical loading trends
 
-![Transmission network map](images/02_transmission_network.png)
+![Transmission Network Map](02_baseline_network.png)
 
-### 3. Automated Overload Detection
+---
 
-GridWatch monitors transmission-line loading and generates alarms when predefined thresholds are exceeded.
+## 2. Key Features
 
-The overload test was performed on **TL-01 (Georgian Bay – Lake Huron, 500 kV)**, which has a rated-current limit of **2,000 A**.
+### Real-Time Transmission Monitoring
 
-| Severity | Target Loading | Actual Loading | Threshold |
+GridWatch continuously displays simulated electrical measurements for the transmission network.
+
+The dashboard updates as the simulation advances, allowing users to observe changing loading conditions and equipment performance.
+
+### Automated Alarm Detection
+
+The system monitors predefined operating thresholds and creates alarms when abnormal conditions occur.
+
+Supported alarm conditions include:
+
+- Transmission-line overloads
+- Undervoltage conditions
+- Equipment outages
+
+Overload alarms are classified into Warning, High, and Critical severity levels.
+
+### Alarm Acknowledgement and Management
+
+Operators can acknowledge alarms without automatically clearing the underlying equipment fault.
+
+The application records acknowledgement status, severity, alarm history, and recovery information.
+
+### Fault Injection and Recovery
+
+GridWatch allows users to simulate abnormal operating conditions, including:
+
+- Increasing transmission-line loading
+- Taking a transmission line out of service
+- Restoring equipment to normal operation
+- Introducing voltage abnormalities
+- Restoring voltage to acceptable levels
+
+### Historical Analytics
+
+Simulated telemetry and alarms are stored in a SQLite database.
+
+SQL queries are used to analyze loading trends, equipment utilization, voltage deviations, alarm frequency, and operational history.
+
+---
+
+## 3. System Validation and Testing
+
+GridWatch was evaluated through seven functional tests to verify its monitoring, fault detection, alarm management, and historical analytics capabilities.
+
+All tests used synthetic telemetry generated by the simulation.
+
+### Test 1 — Normal Operating Conditions
+
+**Objective:** Verify that GridWatch displays the simulated transmission network and its operating measurements correctly.
+
+The initial dashboard displayed:
+
+- 8 substations
+- 12 transmission lines
+- Equipment availability and loading percentages
+- Active alarm counts
+- Operational event records
+
+The interactive network map also displayed transmission-line loading, voltage, current, and power measurements.
+
+**Result:** The dashboard and network map successfully displayed the simulated network and operating data.
+
+![Baseline Operations Overview](01_baseline_overview.png)
+
+![Baseline Network Map](02_baseline_network.png)
+
+### Test 2 — Transmission Line Overload Detection
+
+**Objective:** Verify that GridWatch detects increasing transmission-line loading and assigns the correct alarm severity.
+
+The test was performed on:
+
+**TL-01 — Georgian Bay to Lake Huron (500 kV)**
+
+Rated-current limit: **2,000 A**
+
+Three loading conditions were simulated.
+
+| Test Stage | Target Loading | Actual Loading | Alarm Severity |
 |---|---:|---:|---|
-| Warning | 85% | 85.6% | Above 80% |
-| High | 95% | 95.6% | Above 90% |
-| Critical | 105% | 103.9% | Above 100% |
+| Warning | 85% | 85.6% | Warning |
+| High | 95% | 95.6% | High |
+| Critical | 105% | 103.9% | Critical |
 
-#### Warning Detection
+#### Stage 1 — Warning
 
-At 85.6% loading, GridWatch automatically generated a Warning alarm.
+Loading was increased to approximately 85%.
 
-![Warning alarm](images/03_overload_warning.png)
+GridWatch detected actual loading of 85.6% and generated a Warning alarm because the line exceeded the 80% threshold.
 
-#### High Severity Detection
+![Overload Warning](03_overload_normal_warning.png)
 
-As loading increased to 95.6%, the same alarm escalated from Warning to High.
+#### Stage 2 — High
 
-![High overload alarm](images/04_overload_high.png)
+Loading was increased to approximately 95%.
 
-#### Critical Severity Detection
+The existing TL-01 alarm escalated to High severity when loading reached 95.6%.
 
-At 103.9% loading, GridWatch classified the condition as Critical.
+![High Overload Warning](04_overload_high_warning.png)
 
-![Critical overload alarm](images/05_overload_critical.png)
+#### Stage 3 — Critical
 
-The network map also highlighted TL-01 in red.
+Loading was increased beyond the line's rated-current limit.
 
-At this stage, the line was carrying **2,078 A**, exceeding its rated-current limit of 2,000 A.
+GridWatch reported:
 
-![Critical network visualization](images/06_critical_network.png)
+- **Actual loading:** 103.9%
+- **Current:** 2,078 A
+- **Rated-current limit:** 2,000 A
+- **Alarm severity:** Critical
 
-The test demonstrated automated threshold monitoring, alarm escalation, and synchronized network visualization.
+![Critical Overload Warning](05_overload_critical_warning.png)
 
-### 4. Alarm Acknowledgement and Recovery
+The network map highlighted TL-01 in red to indicate the critical overload condition.
 
-GridWatch allows operators to acknowledge alarms while maintaining visibility of unresolved equipment conditions.
+![Critical Overload Network](06_overload_network.png)
 
-During testing, the Critical alarm associated with TL-01 was acknowledged.
+**Result:** GridWatch successfully identified all three overload severity levels and escalated the existing alarm as loading increased.
 
-The system correctly:
+### Test 3 — Alarm Acknowledgement and Persistence
 
-- Updated the alarm state to Acknowledged
-- Reduced the unacknowledged alarm counter
-- Preserved the Critical severity
-- Maintained the alarm in the active alarm list
-- Kept TL-01 highlighted in red
-- Recorded the acknowledgement in alarm history
+**Objective:** Verify that an operator can acknowledge an active alarm while the underlying fault remains unresolved.
 
-![Acknowledged alarm](images/07_alarm_acknowledged.png)
+The Critical overload alarm from Test 2 was acknowledged.
 
-![Acknowledged alarm on network map](images/08_acknowledged_network.png)
+After acknowledgement:
 
-![Alarm history](images/09_alarm_history.png)
+- The unacknowledged alarm count decreased from 3 to 2.
+- The acknowledged alarm count increased from 0 to 1.
+- TL-01 remained in Critical condition.
+- The alarm remained visible in the active alarm list.
+- The network map continued showing TL-01 in red.
+- The acknowledgement was retained in alarm history.
 
-This demonstrates that acknowledging an alarm does not automatically resolve the underlying fault.
+![Alarm Acknowledged](07_alarm_acknowledged.png)
 
-#### Fault Recovery
+The network map confirmed that acknowledging the alarm did not change the equipment's electrical condition.
 
-After reducing TL-01 loading to approximately 60%, GridWatch automatically cleared the overload alarm.
+![Acknowledged Alarm Network](08_acknowledged_network.png)
 
-The transmission line returned to its normal green appearance, while the alarm history preserved the earlier Critical condition.
+Alarm history also retained the acknowledgement information.
 
-![Recovered transmission line](images/10_fault_recovery.png)
+![Alarm History](09_alarm_history.png)
 
-### 5. Transmission-Line Outage Detection
+**Result:** GridWatch successfully separated operator acknowledgement from fault resolution and preserved the acknowledgement record.
 
-GridWatch also supports simulated transmission-line outages.
+### Test 4 — Fault Recovery and Alarm Clearing
 
-During testing, TL-01 was taken out of service.
+**Objective:** Verify that GridWatch clears an overload alarm after the equipment returns to normal operating conditions.
+
+The TL-01 loading was reduced to approximately 60%.
 
 The system automatically:
 
-- Generated a Critical outage alarm
-- Marked TL-01 as Out of Service
-- Displayed the affected line using a grey dashed connection
-- Reduced its simulated current and power to zero
-- Updated equipment status and availability
+- Cleared the Critical overload alarm.
+- Reduced the Critical open alarm count from 1 to 0.
+- Removed TL-01 from the active alarm list.
+- Returned the line to its normal green visualization.
+- Preserved the alarm's previous Critical severity in history.
 
-![Outage alarm](images/11_outage_alarm.png)
+![Alarm Cleared](10_alarm_cleared.png)
 
-![Transmission-line outage](images/12_line_outage_network.png)
+The network map showed TL-01 operating normally at 59.5% loading.
 
-After restoring the line, GridWatch returned TL-01 to service at approximately 60.1% loading.
+![Recovered Network](11_recovered_network.png)
 
-The outage alarm was cleared, and the event remained available in historical records.
+The alarm history retained the cleared overload event, including its previous Critical condition.
 
-![Restored transmission line](images/13_restored_network.png)
+![Recovery History](12_recovery_history.png)
 
-> The network map illustrates equipment connectivity and operating status. It does not perform contingency power-flow calculations or automatically redistribute transmission flows.
+**Result:** GridWatch successfully detected equipment recovery, cleared the active alarm, and preserved the historical record.
 
-### 6. Undervoltage Detection
+### Test 5 — Transmission Line Outage and Network Topology
 
-GridWatch detects abnormal voltage conditions when measured voltage falls below configured thresholds.
+**Objective:** Verify that GridWatch detects an equipment outage and updates the network visualization.
 
-An undervoltage test was performed on TL-01.
+A simulated outage was applied to TL-01.
 
-The simulated voltage decreased to:
+The system generated a Critical outage alarm.
 
-- **451.4 kV**
-- **0.903 pu**
-- Configured alarm threshold: **0.920 pu**
+![Transmission Line Outage Alarm](13_outage_alarm.png)
 
-GridWatch generated a High severity undervoltage alarm.
+During the outage:
 
-![Undervoltage alarm](images/14_undervoltage_alarm.png)
+- TL-01 was marked Out of Service.
+- Loading decreased to 0%.
+- Current decreased to 0 A.
+- Active and reactive power decreased to zero.
+- The line appeared as a grey dashed connection.
+- A Critical outage alarm was displayed.
 
-The abnormal voltage was also displayed in the selected equipment details.
+![Transmission Line Outage Network](14_outage_network.png)
 
-![Undervoltage network visualization](images/15_undervoltage_network.png)
+#### Equipment Restoration
 
-After restoring the voltage to approximately 499.7 kV, the undervoltage alarm automatically cleared.
+TL-01 was subsequently restored to service.
 
-![Voltage restored](images/16_voltage_recovered.png)
+Following restoration:
 
-The line remained connected throughout the test because an undervoltage condition does not necessarily indicate an equipment outage.
+- Loading returned to approximately 60.1%.
+- Current returned to 1,202 A.
+- The line returned to its normal in-service appearance.
+- The Critical outage alarm was automatically cleared.
 
-### 7. Historical Analytics and SQL Reporting
+![Transmission Line Restored](15_outage_recovered.png)
 
-GridWatch stores simulated operating measurements and alarm records in a SQLite database.
+The outage and restoration records remained available in alarm history.
 
-The Historical Analytics dashboard uses SQL queries to calculate equipment performance statistics and identify abnormal operating conditions.
+![Outage History](16_outage_history.png)
 
-At the end of the test sequence, the system recorded:
+**Result:** GridWatch successfully detected the outage, updated equipment status and visualization, and recorded the recovery.
 
-| Historical Metric | Result |
+**Note:** The network map represents electrical connections and equipment status. It does not perform contingency power-flow analysis or automatic power redistribution.
+
+### Test 6 — Voltage Abnormality Detection
+
+**Objective:** Verify that GridWatch detects undervoltage conditions and records recovery.
+
+A voltage abnormality was simulated on TL-01.
+
+The target voltage was 0.90 pu on a 500 kV transmission line.
+
+The system recorded:
+
+- **Measured voltage:** 451.4 kV
+- **Per-unit voltage:** 0.903 pu
+- **Configured alarm threshold:** 0.920 pu
+- **Alarm severity:** High
+
+GridWatch generated an undervoltage alarm when the voltage fell below the configured threshold.
+
+![Undervoltage Alarm](17_voltage_alarm.png)
+
+The abnormal voltage was displayed in the selected equipment measurements on the network map.
+
+![Undervoltage Network](18_voltage_network.png)
+
+#### Voltage Recovery
+
+The voltage was restored to approximately 1.00 pu.
+
+Following restoration:
+
+- Measured voltage returned to 499.7 kV.
+- The undervoltage alarm automatically cleared.
+- TL-01 remained in service.
+- The historical alarm record was retained.
+
+![Voltage Restored](19_voltage_recovered.png)
+
+The alarm history preserved the undervoltage event and its previous High severity.
+
+![Voltage Alarm History](20_voltage_history.png)
+
+**Result:** GridWatch successfully detected an abnormal voltage condition, displayed the affected measurement, and cleared the alarm after recovery.
+
+### Test 7 — Historical Analytics and Data Persistence
+
+**Objective:** Verify that GridWatch stores simulated measurements and alarm records and uses SQL queries to generate historical performance reports.
+
+The Historical Analytics dashboard was reviewed after completing the previous tests.
+
+The final recorded statistics included:
+
+| Metric | Recorded Result |
 |---|---:|
 | Telemetry samples analyzed | 3,120 |
 | Total alarms raised | 6 |
-| Highest loading | 103.9% |
-| Fleet average loading | 52.0% |
+| Peak transmission-line loading | 103.9% |
+| Average fleet loading | 52.0% |
 | Lines exceeding 90% loading | 1 |
 | TL-01 equipment availability | 99.6% |
 | TL-01 intervals above 90% | 2 |
 
-#### Historical Loading Trends
+#### Historical Loading Overview
 
-GridWatch displays a heatmap of peak transmission-line loading across simulated operating hours.
+The historical loading heatmap displays peak line loading across the simulated operating period.
 
-![Historical loading heatmap](images/17_historical_overview.png)
+The visualization showed the critical overload recorded on TL-01.
 
-It also compares average and maximum loading across the network.
+![Historical Overview](21_historical_overview.png)
 
-![Average and peak loading](images/18_loading_comparison.png)
+#### Average vs. Peak Loading
 
-#### Equipment Utilisation
+GridWatch compares average and maximum transmission-line loading across all 12 lines.
 
-The Utilisation dashboard compares average apparent power against the thermal rating of each transmission line.
+The chart confirmed TL-01 reached a peak loading of 103.9%.
 
-![Equipment utilisation](images/19_utilisation.png)
+![Historical Loading](22_historical_loading.png)
+
+#### Equipment Utilization
+
+The utilization report compares equipment apparent power with rated thermal capacity.
+
+The data can be used to identify which transmission lines operate closest to their rated limits.
+
+![Equipment Utilization](23_historical_utilization.png)
 
 #### Voltage Deviations
 
-Historical voltage analysis identifies measurements outside the configured normal operating band.
+The voltage analysis displays minimum, maximum, and average voltage values across the transmission network.
 
-The undervoltage event on TL-01 was successfully retained at approximately 0.903 pu.
+The report successfully retained the TL-01 undervoltage measurement:
 
-![Historical voltage deviations](images/20_voltage_deviations.png)
+- Voltage: 451.4 kV
+- Per-unit voltage: approximately 0.903 pu
+- Condition: UNDERVOLTAGE
+
+![Historical Voltage Deviations](24_historical_voltage.png)
 
 #### Alarm Frequency Analysis
 
-GridWatch groups historical alarms by:
+The Alarm Frequency dashboard summarizes alarms by type, severity, equipment, and simulated time.
 
-- Alarm type
-- Severity
-- Equipment
-- Simulation time
-- Alarm duration
+The historical records contained:
 
-![Alarm frequency analysis](images/21_alarm_frequency.png)
+- 4 overload alarms
+- 1 outage alarm
+- 1 undervoltage alarm
 
-#### SQL Reports and CSV Export
+![Alarm Frequency](25_alarm_frequency.png)
 
-GridWatch includes parameterized SQL reports executed against the SQLite database through SQLAlchemy.
+#### SQL Reports
 
-Reports can retrieve operating measurements, equipment information, and historical performance data.
+GridWatch provides parameterized SQL reports executed against its SQLite database through SQLAlchemy.
 
-The application also provides a CSV download option for exporting query results.
+The SQL Reports section displays the query and its results, allowing users to inspect stored measurements and equipment information.
 
-![SQL reports](images/22_sql_reports.png)
+The application also provides CSV export functionality for report results.
+
+![SQL Reports](26_sql_reports.png)
+
+**Result:** GridWatch successfully retained historical telemetry, calculated equipment performance statistics, displayed abnormal operating events, and generated SQL reports.
 
 ---
 
-## Project Validation
+## 4. Validation Summary
 
-GridWatch was evaluated through seven functional demonstration tests using the same simulation history.
+The seven functional tests demonstrated the main monitoring and alarm-management features of GridWatch.
 
-| Test | Description | Result |
+| Test | Description | Status |
 |---|---|---|
-| 1 | Baseline system monitoring | Completed |
-| 2 | Transmission-line overload detection | Passed |
-| 3 | Alarm acknowledgement and persistence | Passed |
-| 4 | Fault recovery and alarm clearing | Passed |
-| 5 | Transmission-line outage and restoration | Passed |
-| 6 | Undervoltage detection and recovery | Passed |
-| 7 | Historical analytics and SQL reporting | Passed for demonstrated views |
+| 1 | Normal Operating Conditions | Passed |
+| 2 | Transmission Line Overload Detection | Passed |
+| 3 | Alarm Acknowledgement and Persistence | Passed |
+| 4 | Fault Recovery and Alarm Clearing | Passed |
+| 5 | Transmission Line Outage and Restoration | Passed |
+| 6 | Voltage Abnormality Detection | Passed |
+| 7 | Historical Analytics and SQL Reporting | Passed for demonstrated functionality |
 
-The results demonstrate that GridWatch can identify simulated operating abnormalities, maintain alarm states, record equipment recovery, and preserve historical data for later analysis.
+### Main Outcomes
 
-These tests validate the demonstrated dashboard functionality using synthetic telemetry. They do not constitute validation of an actual transmission grid model or production monitoring system.
+The testing demonstrated that GridWatch can:
+
+1. Monitor simulated transmission equipment measurements.
+2. Detect overloads and classify alarm severity.
+3. Escalate an existing alarm as conditions worsen.
+4. Allow operator acknowledgement without clearing unresolved faults.
+5. Detect fault recovery and clear active alarms.
+6. Identify transmission-line outages and update equipment status.
+7. Detect undervoltage conditions and record recovery.
+8. Store historical telemetry and alarm data.
+9. Generate SQL-based performance reports.
 
 ---
 
-## Technologies Used
+## 5. Technologies Used
 
-| Technology | Purpose |
+| Technology | Application |
 |---|---|
-| Python | Application development and simulation logic |
-| Streamlit | Interactive web dashboard |
-| SQLite | Historical telemetry and alarm storage |
-| SQL | Data retrieval, filtering, and analysis |
-| SQLAlchemy | Database access and reporting |
-| Git | Version control |
-| GitHub | Source code hosting |
+| Python | Simulation logic, monitoring, calculations, and backend development |
+| Streamlit | Interactive web interface and dashboard |
+| SQLite | Storage of telemetry, alarms, and operational records |
+| SQL | Historical data retrieval and analysis |
+| SQLAlchemy | Database access and parameterized queries |
+| Git | Source code version control |
+| GitHub | Repository hosting |
 | Streamlit Community Cloud | Public application deployment |
 
-## Repository Structure
+---
+
+## 6. Repository Structure
 
 ```text
 gridwatch/
-├── app.py
+├── .streamlit/
+├── data/
 ├── gridwatch/
 │   ├── __init__.py
 │   ├── alarms.py
@@ -302,26 +461,50 @@ gridwatch/
 │   ├── telemetry.py
 │   └── ui/
 ├── tests/
-├── data/
-├── .streamlit/
+├── app.py
 ├── requirements.txt
 ├── Launch_GridWatch.bat
-├── images/
-└── README.md
+├── README.md
+├── 01_baseline_overview.png
+├── 02_baseline_network.png
+├── 03_overload_normal_warning.png
+├── 04_overload_high_warning.png
+├── 05_overload_critical_warning.png
+├── 06_overload_network.png
+├── 07_alarm_acknowledged.png
+├── 08_acknowledged_network.png
+├── 09_alarm_history.png
+├── 10_alarm_cleared.png
+├── 11_recovered_network.png
+├── 12_recovery_history.png
+├── 13_outage_alarm.png
+├── 14_outage_network.png
+├── 15_outage_recovered.png
+├── 16_outage_history.png
+├── 17_voltage_alarm.png
+├── 18_voltage_network.png
+├── 19_voltage_recovered.png
+├── 20_voltage_history.png
+├── 21_historical_overview.png
+├── 22_historical_loading.png
+├── 23_historical_utilization.png
+├── 24_historical_voltage.png
+├── 25_alarm_frequency.png
+└── 26_sql_reports.png
 ```
 
 ---
 
-## Installation and Setup
+## 7. Installation and Setup
 
-### 1. Clone the Repository
+### Step 1 — Clone the Repository
 
 ```bash
 git clone https://github.com/AhmadMehmood4/gridwatch.git
 cd gridwatch
 ```
 
-### 2. Create a Virtual Environment
+### Step 2 — Create a Virtual Environment
 
 ```bash
 python -m venv .venv
@@ -339,98 +522,99 @@ For macOS or Linux:
 source .venv/bin/activate
 ```
 
-### 3. Install Dependencies
+### Step 3 — Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Run GridWatch
+### Step 4 — Run GridWatch
 
 ```bash
 streamlit run app.py
 ```
 
-The dashboard will open in your web browser.
+The Streamlit dashboard will open in your browser.
 
-Windows users can also launch the application using the included `Launch_GridWatch.bat` file.
+Windows users can also use the included `Launch_GridWatch.bat` file to launch the application.
 
 ### Live Application
 
-GridWatch is publicly deployed using Streamlit Community Cloud.
-
-**[Open GridWatch](https://gridwatch-transmission.streamlit.app/)**
+**[Launch GridWatch](https://gridwatch-transmission.streamlit.app/)**
 
 ---
 
-## Project Scope and Limitations
+## 8. Project Scope and Limitations
 
-GridWatch was developed as an educational engineering and software project.
+GridWatch is an educational engineering project designed to demonstrate transmission monitoring, alarm management, data visualization, and historical analytics.
 
 The following limitations apply:
 
 - The transmission network is fictional and inspired by Ontario geography.
-- Measurements are generated using synthetic telemetry rather than collected from operational equipment.
-- Electrical measurements use simplified calculations and are not outputs of a validated AC power-flow model.
-- The network diagram represents equipment connections but does not perform transmission contingency analysis.
-- Fault injection is intended for demonstrating monitoring and alarm-management behaviour.
-- The application is not connected to live utility infrastructure or SCADA/EMS systems.
-
-These limitations keep the project focused on monitoring workflows, software development, and historical data analysis.
-
-## What I Learned
-
-Developing GridWatch provided practical experience in several areas of electrical engineering and software development.
-
-**Transmission System Monitoring**
-
-Working with transmission-line loading, current limits, voltage classes, equipment status, and abnormal operating conditions.
-
-**Python Development**
-
-Organizing a larger Python application into reusable modules for simulation, monitoring, alarm processing, and analytics.
-
-**SQL and Database Management**
-
-Storing telemetry and event records, retrieving historical measurements, and calculating equipment performance statistics through SQL queries.
-
-**Automated Alarm Management**
-
-Implementing configurable thresholds, alarm severity escalation, operator acknowledgement, automatic clearing, and historical tracking.
-
-**Data Visualization**
-
-Presenting operational measurements through interactive dashboards, network diagrams, loading charts, and historical reports.
-
-**Software Testing and Deployment**
-
-Performing controlled functional tests, documenting results, using Git for version control, and deploying the application online.
+- All telemetry is synthetically generated.
+- The application is not connected to live electrical equipment, SCADA systems, or an operational EMS.
+- Electrical quantities use simplified modelling and are not the result of a validated AC power-flow calculation.
+- The network map illustrates equipment connectivity rather than calculating power redistribution after outages.
+- Fault injection is used for controlled functional testing.
+- GridWatch is not intended for actual utility operations or protection-system control.
 
 ---
 
-## Future Improvements
+## 9. What I Learned
 
-Potential future enhancements include:
+Developing GridWatch provided practical experience in both electrical engineering and software development.
 
-- Integration with sample SCADA-style data feeds
+### Transmission System Monitoring
+
+I gained experience working with voltage classes, current ratings, line loading, equipment status, and abnormal operating conditions.
+
+### Python Development
+
+I developed a modular Python application with separate components for simulation, telemetry, alarm processing, calculations, and analytics.
+
+### SQL and Database Management
+
+I worked with structured telemetry records, database queries, historical measurements, and equipment performance reports.
+
+### Alarm Management
+
+I implemented and tested threshold detection, severity escalation, operator acknowledgement, automatic alarm clearing, and historical tracking.
+
+### Data Visualization
+
+I created interactive dashboards, network diagrams, charts, loading trends, and historical reports to make operating information easier to interpret.
+
+### Testing and Deployment
+
+I performed controlled functional tests, documented their results, and deployed the project using GitHub and Streamlit Community Cloud.
+
+---
+
+## 10. Future Improvements
+
+Potential improvements to GridWatch include:
+
+- Integration with sample SCADA-style telemetry
 - More advanced network topology analysis
-- Power-flow simulations using established engineering libraries
-- Automated reporting of operating events
-- Additional database queries and performance indicators
-- Expanded automated testing
-- More advanced fault scenarios and equipment monitoring
+- Power-flow modelling using established electrical engineering libraries
+- Expanded equipment fault scenarios
+- Automated event and performance reports
+- Additional SQL analytics
+- Expanded automated unit and integration testing
+- Improved operational monitoring visualizations
 
 ---
 
-## Author
+## 11. Author
 
 **Ahmad Mehmood**
 
 Electrical Engineering  
 Toronto Metropolitan University
 
-- **GitHub:** [AhmadMehmood4](https://github.com/AhmadMehmood4)
-- **Live Project:** [GridWatch Dashboard](https://gridwatch-transmission.streamlit.app/)
+**GitHub:** [AhmadMehmood4](https://github.com/AhmadMehmood4)
+
+**Live Project:** [GridWatch Dashboard](https://gridwatch-transmission.streamlit.app/)
 
 ---
 
